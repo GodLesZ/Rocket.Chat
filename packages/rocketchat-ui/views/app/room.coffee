@@ -229,8 +229,17 @@ Template.room.events
 	"click .upload-progress > a": ->
 		Session.set "uploading-cancel-#{this.id}", true
 
-	"click .unread-bar > a": ->
+	"click .unread-bar > a.mark-read": ->
 		readMessage.readNow(true)
+
+	"click .unread-bar > a.jump-to": ->
+		message = RoomHistoryManager.getRoom(@_id)?.firstUnread.get()
+		if message?
+			RoomHistoryManager.getSurroundingMessages(message, 50)
+		else
+			subscription = ChatSubscription.findOne({ rid: @_id })
+			message = ChatMessage.find({ rid: @_id, ts: { $gt: subscription?.ls } }, { sort: { ts: 1 }, limit: 1 }).fetch()[0]
+			RoomHistoryManager.getSurroundingMessages(message, 50)
 
 	"click .flex-tab .more": (event, t) ->
 		if RocketChat.TabBar.isFlexOpen()
@@ -484,12 +493,16 @@ Template.room.onCreated ->
 	@autorun =>
 		@subscribe 'fullUserData', Session.get('showUserInfo'), 1
 
+	Meteor.call 'getRoomModeratorsAndOwners', @data._id, (error, results) ->
+		if error
+			return toastr.error error.reason
+
+		for record in results
+			delete record._id
+			RoomModeratorsAndOwners.upsert { rid: record.rid, "u._id": record.u._id }, record
 
 Template.room.onDestroyed ->
-	RocketChat.TabBar.resetButtons()
-
 	window.removeEventListener 'resize', this.onWindowResize
-
 
 Template.room.onRendered ->
 	unless window.chatMessages

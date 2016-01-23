@@ -6,9 +6,11 @@ RocketChat.settings.addGroup 'Accounts', ->
 	@add 'Accounts_AllowUserProfileChange', true, { type: 'boolean', public: true }
 	@add 'Accounts_AllowUserAvatarChange', true, { type: 'boolean', public: true }
 	@add 'Accounts_AllowUsernameChange', true, { type: 'boolean', public: true }
+	@add 'Accounts_AllowEmailChange', true, { type: 'boolean', public: true }
 	@add 'Accounts_AllowPasswordChange', true, { type: 'boolean', public: true }
 	@add 'Accounts_RequireNameForSignUp', true, { type: 'boolean', public: true }
 	@add 'Accounts_LoginExpiration', 90, { type: 'int', public: true }
+	@add 'Accounts_ShowFormLogin', true, { type: 'boolean', public: true }
 
 	@section 'Registration', ->
 		@add 'Accounts_EmailVerification', false, { type: 'boolean', public: true }
@@ -76,6 +78,7 @@ RocketChat.settings.addGroup 'General', ->
 	@add 'Allow_Invalid_SelfSigned_Certs', false, { type: 'boolean' }
 	@add 'Disable_Favorite_Rooms', false, { type: 'boolean' }
 	@add 'CDN_PREFIX', '', { type: 'string' }
+	@add 'Force_SSL', false, { type: 'boolean', public: true }
 	@add 'Debug_Level', 'error', { type: 'select', values: [ { key: 'error', i18nLabel: 'Only_errors' }, { key: 'debug', i18nLabel: 'All_logs' } ] }
 	@add 'Restart', 'restart_server', { type: 'action', actionText: 'Restart_the_server' }
 
@@ -91,11 +94,12 @@ RocketChat.settings.addGroup 'API', ->
 
 
 RocketChat.settings.addGroup 'SMTP', ->
-	@add 'SMTP_Host', '', { type: 'string' }
-	@add 'SMTP_Port', '', { type: 'string' }
-	@add 'SMTP_Username', '', { type: 'string' }
-	@add 'SMTP_Password', '', { type: 'string' }
+	@add 'SMTP_Host', '', { type: 'string', env: true }
+	@add 'SMTP_Port', '', { type: 'string', env: true }
+	@add 'SMTP_Username', '', { type: 'string', env: true }
+	@add 'SMTP_Password', '', { type: 'string', env: true }
 	@add 'From_Email', '', { type: 'string', placeholder: 'email@domain' }
+	@add 'SMTP_Test_Button', 'sendSMTPTestEmail', { type: 'action', actionText: 'Send_a_test_mail_to_my_user' }
 
 	@section 'Invitation', ->
 		@add 'Invitation_Subject', 'You have been invited to Rocket.Chat', { type: 'string' }
@@ -161,13 +165,6 @@ RocketChat.settings.addGroup 'Layout', ->
 RocketChat.settings.add 'Statistics_opt_out', false, { type: 'boolean', group: false }
 
 RocketChat.settings.init()
-
-Meteor.startup ->
-	if process?.env? and not process.env['MAIL_URL']? and RocketChat.settings.get('SMTP_Host') and RocketChat.settings.get('SMTP_Username') and RocketChat.settings.get('SMTP_Password')
-		process.env['MAIL_URL'] = "smtp://" + encodeURIComponent(RocketChat.settings.get('SMTP_Username')) + ':' + encodeURIComponent(RocketChat.settings.get('SMTP_Password')) + '@' + encodeURIComponent(RocketChat.settings.get('SMTP_Host'))
-		if RocketChat.settings.get('SMTP_Port')
-			process.env['MAIL_URL'] += ':' + parseInt(RocketChat.settings.get('SMTP_Port'))
-
 
 # Remove runtime settings (non-persistent)
 Meteor.startup ->

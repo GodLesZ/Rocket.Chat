@@ -475,7 +475,8 @@ form.inline {
 	}
 }
 
-input[disabled] {
+input[disabled],
+textarea[disabled] {
 	background-color: #f4f4f4 !important;
 }
 
@@ -1726,6 +1727,10 @@ a.github-fork {
 			.transform(translateX(0));
 		}
 	}
+	&.main-modal {
+		left: 0px;
+		margin-right: 0px;
+	}
 	.container-fluid {
 		padding-top: 0;
 	}
@@ -1800,6 +1805,12 @@ a.github-fork {
 				&.setting-changed {
 					> label {
 						color: #627CFF
+					}
+				}
+
+				&[disabled] {
+					label {
+						color: #888;
 					}
 				}
 
@@ -2130,8 +2141,16 @@ a.github-fork {
 		text-transform: uppercase;
 		text-align: center;
 
-		> a {
+		> a.mark-read {
 			float: right;
+
+			&:hover {
+				cursor: pointer;
+			}
+		}
+
+		> a.jump-to {
+			float: left;
 
 			&:hover {
 				cursor: pointer;
@@ -2503,6 +2522,13 @@ a.github-fork {
 	position: relative;
 	line-height: 20px;
 	min-height: 40px;
+
+	&.highlight {
+		-webkit-animation: highlight 3s;
+		-moz-animation: highlight 3s;
+		-o-animation: highlight 3s;
+		animation: highlight 3s;
+	}
 
 	.body, .user.user-card-message, .time {
 		-webkit-user-select: text;
@@ -3061,7 +3087,12 @@ a.github-fork {
 		margin-left: 120px;
 		white-space: normal;
 		.calc(width, ~'100% - 120px');
+
 		h3 {
+			-webkit-user-select: text;
+			-moz-user-select: text;
+			-ms-user-select: text;
+			user-select: text;
 			font-size: 24px;
 			margin-bottom: 8px;
 			line-height: 27px;
@@ -3097,6 +3128,10 @@ a.github-fork {
 			}
 		}
 		p {
+			-webkit-user-select: text;
+			-moz-user-select: text;
+			-ms-user-select: text;
+			user-select: text;
 			line-height: 18px;
 			font-size: 12px;
 			font-weight: 300;
@@ -4257,7 +4292,10 @@ a.github-fork {
 }
 
 .inline-video {
-	max-height: 300px;
+    height: auto;
+    width: 100%;
+    max-width: 480px;
+    max-height: 270px;
 }
 
 .attention-message {
